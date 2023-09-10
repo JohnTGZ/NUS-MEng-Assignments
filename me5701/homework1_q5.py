@@ -28,9 +28,6 @@ def randomUnitVector(sz):
 A = todaMatrix(100)
 u_k = randomUnitVector(100)
 
-print("A: ",A)
-print("u_k: ",u_k)
-
 k_range = np.arange(0, 100, 1)
 c_k_arr = []
 e_k_arr = []
@@ -43,9 +40,6 @@ for k in k_range:
     
     e_k = np.linalg.norm(c_k * u_k - B)
     e_k_arr.append(e_k)
-
-    # print("B:", B)
-    # print("c_k:", c_k)
     
     u_k = B / np.linalg.norm(B)
 
