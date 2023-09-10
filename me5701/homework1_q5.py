@@ -12,7 +12,7 @@ def todaMatrix(sz):
 
         # Super diagonals
         if i > 0:
-            A[i-1, i] = 1
+            A[i-1, i] = -1
         
         # Sub diagonals
         if i > 0:
@@ -45,12 +45,15 @@ for k in k_range:
     e_k_arr.append(e_k)
 
     # print("B:", B)
-    print("c_k:", c_k)
+    # print("c_k:", c_k)
     
     u_k = B / np.linalg.norm(B)
 
+fig, ax = plt.subplots()
 
+c_k_line, = ax.plot(k_range, c_k_arr, label='c_k')
+e_k_line, = ax.plot(k_range, e_k_arr, label='e_k')
+ax.legend(handles=[c_k_line, e_k_line])
 
-plt.plot(k_range, c_k_arr)
 plt.show()
 
