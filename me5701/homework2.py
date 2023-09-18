@@ -5,32 +5,41 @@ import matplotlib.pyplot as plt
 
 # With reference to http://silas.psfc.mit.edu/22.15/lectures/chap1.xml
 
-def construct_S(x_data_pts, order=None):
-  """_summary_
+def constructA(x_data_pts, order=None):
+  """Construct the A matrix for polynomial fitting in the form "Ax = b"
 
   Args:
       x_data_pts (np.array): x data points
       order (int, optional): Highest order in the polynomial to fit. Defaults to None.
 
   Returns:
-      np.array: Matrix S of the form Sc = b
+      np.array: Matrix A of the form Sc = b
   """
   n = len(x_data_pts)
 
   if order is None:
     order = n-1
 
-  S = np.ndarray((n, order+1))
+  A = np.ndarray((n, order+1))
 
   # For each row
   for i in np.arange(0,n):
     # For each column
     for j in np.arange(0,order+1):
-      S[i, j] = x_data_pts[i]**j
+      A[i, j] = x_data_pts[i]**j
 
-  return S
+  return A
 
-def eval_polynomial(coeffs, x):
+def evalPolynomial(coeffs, x):
+  """Evaluate value of polynomial in the form "c_0 + c_1 * x + ... c_n * x^n"
+
+  Args:
+      coeffs (array): Value of coefficients
+      x (float): Value of x
+
+  Returns:
+      float: polynomial value
+  """
   val = 0
   for i in range(0, len(coeffs)):
     val += coeffs[i] * (x ** i)
@@ -78,22 +87,23 @@ print(f"\n")
 print(f"Part a")
 print(f"\n")
 
-S = construct_S(x_data_pts)
+A = constructA(x_data_pts)
 
-print(S)
+print(A)
 
-S_inv = np.linalg.inv(S)
+A_inv = np.linalg.inv(A)
 
-print("S_inv: ", S_inv)
+print("A_inv: ", A_inv)
 
-# Solve for coefficients. S * c = y_data_pts  
-coeffs = S_inv @ y_data_pts
+# Solve for coefficients. 
+# A * coeffs = y_data_pts 
+coeffs = A_inv @ y_data_pts
 
 print("coeffs: ", coeffs)
 
 # Evaluate polynomial values for plotting
 xp = np.linspace(-5, 5, 100)
-yp_1 = np.array([eval_polynomial(coeffs, x) for x in xp])
+yp_1 = np.array([evalPolynomial(coeffs, x) for x in xp])
 
 plt.show()
 
@@ -105,23 +115,25 @@ print(f"Part b")
 print(f"\n")
 
 # obtain the best fit parabola y = ax**2 + bx + c
-# Construct S up to the 2nd power
-S = construct_S(x_data_pts, 2)
+# Construct A up to the 2nd power
+A = constructA(x_data_pts, 2)
 
-print(S.shape)
+print(A.shape)
 
-M = np.identity(S.shape[0])
-S_left_inv = getLeftWeightedInverse(S, M)
+M = np.identity(A.shape[0])
+A_left_inv = getLeftWeightedInverse(A, M)
 
-print(f"{S_left_inv.shape} * {y_data_pts.shape}")
+print(f"{A_left_inv.shape} * {y_data_pts.shape}")
 
-coeffs_2 = S_left_inv @ y_data_pts
+# Solve for coefficients. 
+# A * coeffs = y_data_pts  
+coeffs_2 = A_left_inv @ y_data_pts
 
 print(f"coeffs_2 = {coeffs_2}")
 
 # Evaluate polynomial values for plotting
 xp = np.linspace(-5, 5, 100)
-yp_2 = np.array([eval_polynomial(coeffs_2, x) for x in xp])
+yp_2 = np.array([evalPolynomial(coeffs_2, x) for x in xp])
 
 ######
 # Part c
@@ -133,8 +145,7 @@ print(f"\n")
 # obtain the best fit parabola y = g(x) = ax**4 + bx**3 + cx**2 + dx + e
 # while minimizing the cost C0(a,b,c,d,e) = integrate_over_-2_to_1 ( (g(x)**2) w.r.t dx)
 
-# Minimize cost from x=-2 to x=1?
-# First we do d/dx(c0) = 0
+# Weight matrix W obtained from file "./weights_calculation.ipynb"
 W = np.array([
   [57,      -255/8,   129/7,    -21/2,    33/5],
   [-255/8,  129/7,    -21/2,    33/5,     -15/4,],
@@ -143,19 +154,25 @@ W = np.array([
   [33/5,    -15/4,    3,        -3/2,     3],
 ])
 
-# Construct S up to the 4th power
-S = construct_S(x_data_pts, 4)
-print(f"S shape: {S.shape}")
+# Construct A up to the 4th power
+A = constructA(x_data_pts, 4)
+print(f"A shape: {A.shape}")
 
-S_right_inv = getRightWeightedInverse(S, W)
+A_right_inv = getRightWeightedInverse(A, W)
 
-coeffs_3 = S_right_inv @ y_data_pts
+# Solve for coefficients. 
+# A * coeffs = y_data_pts 
+coeffs_3 = A_right_inv @ y_data_pts
 
 print(f"coeffs_3 = {coeffs_3}")
 
 # Evaluate polynomial values for plotting
 xp = np.linspace(-5, 5, 100)
-yp_3 = np.array([eval_polynomial(coeffs_3, x) for x in xp])
+yp_3 = np.array([evalPolynomial(coeffs_3, x) for x in xp])
+
+######
+# Part d
+######
 
 ######
 # Plotting
