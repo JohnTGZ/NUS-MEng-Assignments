@@ -19,8 +19,8 @@ B = [0.0564+(b)/(10+c),           0.0319; ...
      -1.4269,                     -0.2730;];
 
 % Output matrix
-C = [-3.2988,           -2.1932+(10*c+d)/(100+5*a), 0.0370,  -0.0109; ...
-     0.2922-(a*b)/500,  -2.1506,                   -0.0104, 0.0163;];
+C = [-3.2988,           -2.1932+(10*c+d)/(100+5*a), 0.0370,  -0.0109; 
+     0.2922-(a*b)/500,  -2.1506,                   -0.0104,  0.0163;];
 
 x_0 = [0.5; -0.1; 0.3; -0.8;];
 
@@ -190,24 +190,88 @@ sys_cl = ss(A_cl, B, C, 0);
 % Obtain 4 state responses to non-zero initial state with zero external
 % inputs
 %%%%%%%%%
-initial(sys, x_0);
+[y_init, tOut, x_init] = initial(sys, x_0);
+[y_cl_init, tOut_cl, x_cl_init] = initial(sys_cl, x_0);
 
+tiledlayout(2,1)
+
+ax1 = nexttile;
+plot(ax1, tOut, x_init);
+title(ax1, '[Open loop] 4 state responses for Open loop initial state response')
+xlabel(ax1, 'Time');
+ylabel(ax1, 'Amplitude');
+
+ax2 = nexttile;
+plot(ax2, tOut_cl, x_cl_init);
+title(ax2, '[Closed loop] 4 state responses for initial state response')
+xlabel(ax2, 'Time');
+ylabel(ax2, 'Amplitude');
 
 %%%%%%%%%
 % Obtain step response
 %%%%%%%%%
 
 % Display step response of open loop system
-% step(sys)
+% [y_step, tOut, x_step] = step(sys);
+% 
+% tiledlayout(2,2)
+% 
+% ax1 = nexttile;
+% plot(ax1, tOut, y_step(:, 1,1));
+% title(ax1, '[Open loop] y output for u = [1,0].T ')
+% xlabel(ax1, 'Time');
+% ylabel(ax1, 'Amplitude');
+% 
+% ax2 = nexttile;
+% plot(ax2, tOut, y_step(:, 2,1));
+% title(ax2, '[Open loop] y output for u = [1,0].T ')
+% xlabel(ax2, 'Time');
+% ylabel(ax2, 'Amplitude');
+% 
+% ax3 = nexttile;
+% plot(ax3, tOut, y_step(:, 1,2));
+% title(ax3, '[Open loop] y output for u = [1,0].T ')
+% xlabel(ax3, 'Time');
+% ylabel(ax3, 'Amplitude');
+% 
+% ax4 = nexttile;
+% plot(ax4, tOut, y_step(:, 2,2));
+% title(ax4, '[Open loop] y output for u = [1,0].T ')
+% xlabel(ax4, 'Time');
+% ylabel(ax4, 'Amplitude');
+% 
+% [y_step, tOut, x_step] = step(sys_cl);
+% 
+% tiledlayout(2,2)
+% 
+% ax1 = nexttile;
+% plot(ax1, tOut, y_step(:, 1,1));
+% title(ax1, '[Closed loop] y output for u = [1,0].T ')
+% xlabel(ax1, 'Time');
+% ylabel(ax1, 'Amplitude');
+% 
+% ax2 = nexttile;
+% plot(ax2, tOut, y_step(:, 2,1));
+% title(ax2, '[Closed loop] y output for u = [1,0].T ')
+% xlabel(ax2, 'Time');
+% ylabel(ax2, 'Amplitude');
+% 
+% ax3 = nexttile;
+% plot(ax3, tOut, y_step(:, 1,2));
+% title(ax3, '[Closed loop] y output for u = [1,0].T ')
+% xlabel(ax3, 'Time');
+% ylabel(ax3, 'Amplitude');
+% 
+% ax4 = nexttile;
+% plot(ax4, tOut, y_step(:, 2,2));
+% title(ax4, '[Closed loop] y output for u = [1,0].T ')
+% xlabel(ax4, 'Time');
+% ylabel(ax4, 'Amplitude');
 
-% Display step response of closed loop system
-step(sys_cl);
 
-
-% You can use functions such as 
-% step: Step response
-% initial: Given initial conditions, get unforced system response
-% lsim: Plot simulated time response of dynamic system to arbitrary inputs; simulated response data
+%%%%%%%%%
+% Check step response data
+%%%%%%%%%
 
 step_info_closed = stepinfo(sys_cl);
 
@@ -222,26 +286,26 @@ step_info_closed_y2_u2 = step_info_closed(2,2);
 disp("With step input U_1 for output Y_1")
 fprintf("Settling Time: %f \n", step_info_closed_y1_u1.SettlingTime)
 fprintf("Peak overshoot: %f %% \n", step_info_closed_y1_u1.Overshoot)
+fprintf('Is design requirement met? %d \n \n', isDesignRequirementsMet(step_info_closed_y1_u1));
 
 disp("With step input U_1 for output Y_2")
 fprintf("Settling Time: %f \n", step_info_closed_y2_u1.SettlingTime)
 fprintf("Peak overshoot: %f %% \n", step_info_closed_y2_u1.Overshoot)
+fprintf('Is design requirement met? %d \n \n', isDesignRequirementsMet(step_info_closed_y2_u1));
 
 disp("With step input U_2 for output Y_1")
 fprintf("Settling Time: %f \n", step_info_closed_y1_u2.SettlingTime)
 fprintf("Peak overshoot: %f %% \n", step_info_closed_y1_u2.Overshoot)
+fprintf('Is design requirement met? %d \n \n', isDesignRequirementsMet(step_info_closed_y1_u2));
 
 disp("With step input U_2 for output Y_2")
 fprintf("Settling Time: %f \n", step_info_closed_y2_u2.SettlingTime)
 fprintf("Peak overshoot: %f %% \n", step_info_closed_y2_u2.Overshoot)
+fprintf('Is design requirement met? %d \n \n', isDesignRequirementsMet(step_info_closed_y2_u2));
 
 
-fprintf('Is design requirement met? %d \n', isDesignRequirementsMet(sys_cl));
-
-function design_fulfilled = isDesignRequirementsMet(sys)
-    step_info = stepinfo(sys);
-    if step_info.SettlingTime < 20 ...
-       && step_info.Overshoot < 6
+function design_fulfilled = isDesignRequirementsMet(step_info)
+    if step_info.SettlingTime < 20 && step_info.Overshoot < 10
         design_fulfilled = true;
     else
         design_fulfilled = false;

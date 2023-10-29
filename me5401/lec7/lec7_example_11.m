@@ -1,10 +1,4 @@
-
 % State Space Model
-
-%Arbitrary params
-% X_dot = A * X + B * U
-% Y = C * X
-[a, b, c, d] = deal(4, 9, 1, 2);
 
 % State(or system) matrix
 A = [0 0 4 1;
@@ -139,8 +133,6 @@ K = K_bar * T;
 
 disp("Gain matrix K: ");
 disp(K);
-
-
 
 % Remove small values below a certain threshold
 function M = rmv_eps(M)

@@ -1,28 +1,34 @@
 format shortEng
+%%%%%%
 % State Space Model
+%%%%%%
 
 %Arbitrary params
 % X_dot = A * X + B * U
 % Y = C * X
-[a, b, c, d] = deal(4, 9, 1, 2);
+% [a, b, c, d] = deal(4, 3, 2, 3);
+[a, b, c, d] = deal(5, 9, 1, 2);
 
 % State(or system) matrix
-A = [-8.8487 + (a-b)/5,     -0.0399,              -5.55 + (c+d)/10,      3.5846; ...
-     -4.5740,               2.5010 * (d+5)/(c+5), -4.3662,               -1.1183-(a-c)/20; ...
-     3.7698,                16.1212 - (c/5),      -18.2103+(a+d)/(b+4),  4.4936; ...
+A = [-8.8487 + (a-b)/5,     -0.0399,              -5.55 + (c+d)/10,      3.5846; 
+     -4.5740,               2.5010 * (d+5)/(c+5), -4.3662,               -1.1183-(a-c)/20; 
+     3.7698,                16.1212 - (c/5),      -18.2103+(a+d)/(b+4),  4.4936; 
      -8.5645-(a-b)/(c+d+2), 8.3742,               -4.4331,               -7.7181*(c+5)/(b+5);];
 
 % Input matrix
-B = [0.0564+(b)/(10+c),           0.0319; ...
-     0.0165-(c+d-5)/(1000+20*a),  -0.02; ...
-     4.4939,                      1.5985*(a+10)/(b+12); ...
+B = [0.0564+(b)/(10+c),           0.0319; 
+     0.0165-(c+d-5)/(1000+20*a),  -0.02; 
+     4.4939,                      1.5985*(a+10)/(b+12); 
      -1.4269,                     -0.2730;];
 
 % Output matrix
-C = [-3.2988,           -2.1932+(10*c+d)/(100+5*a), 0.0370,  -0.0109; ...
-     0.2922-(a*b)/500,  -2.1506,                   -0.0104, 0.0163;];
+C = [-3.2988,           -2.1932+(10*c+d)/(100+5*a), 0.0370,  -0.0109; 
+     0.2922-(a*b)/500,  -2.1506,                   -0.0104,   0.0163;];
 
 x_0 = [0.5; -0.1; 0.3; -0.8;];
+
+u_1 = [1; 0;];
+u_2 = [0; 1;];
 
 % Number of states n
 n = size(A, 2);
@@ -149,9 +155,9 @@ A_bar_cl = A_bar - B_bar * K_bar;
 disp("A_bar_cl (Closed loop)")
 disp(A_bar_cl)
 
-%%%%%%%%%
-% Get gain matrix K
-%%%%%%%%%
+%%%%%%
+% Get gain matrix K for closed loop system
+%%%%%%
 % From closed loop desired polynomial: (s + 18/25)*(s + 24/25)*((12*s)/25 + s^2 + 4/25) 
 % Or expanded as s^4 + (54*s^3)/25 + (1036*s^2)/625 + (9384*s)/15625 + 1728/15625
 % Construct the desired closed loop matrix
@@ -170,44 +176,119 @@ K_bar = subs(K_bar, K_bar_soln);
 K = K_bar * T;
 
 disp("Gain matrix K: ");
-disp(K);
+disp(vpa(K));
+
+%%%%%%
+% Form open loop system for simulation
+%%%%%%
+
+% Original open loop System
+sys = ss(A, B, C, 0);
+
+% Get eigenvalues for open loop system matrix
+A_eigenvalues = eig(A);
+disp("Open loop system eigenvalues (A): ");
+disp(vpa(A_eigenvalues));
+
+%%%%%%
+% Form closed loop system for simulation
+%%%%%%
 
 % Get closed loop system matrix for A
 A_cl = double(A - B * K);
+
+% Closed loop System
+% x_dot = (A - B * K)x 
+sys_cl = ss(A_cl, B, C, 0);
+
 % Get eigenvalues for closed loop system matrix
 A_cl_eigenvalues = eig(A_cl);
 disp("Closed loop system eigenvalues (A_cl): ");
 disp(vpa(A_cl_eigenvalues));
 
-vpa(A_cl)
-
-% Original open loop System
-sys = ss(A, B, C, 0);
-% Closed loop System
-sys_cl = ss(A_cl, B, C, 0);
-
 %%%%%%%%%
 % Obtain 4 state responses to non-zero initial state with zero external
 % inputs
 %%%%%%%%%
-initial(sys, x_0)
+figure(1)
 
-% initial(sys_cl, x_0)
+[y_init, tOut, x_init] = initial(sys, x_0);
+[y_cl_init, tOut_cl, x_cl_init] = initial(sys_cl, x_0);
+
+tlay_1 = tiledlayout(2,1);
+title(tlay_1, '4 state variable responses with zero external input and non-zero initial state');
+xlabel(tlay_1, 'Time');
+ylabel(tlay_1, 'Amplitude');
+
+ax1 = nexttile(tlay_1);
+plot(ax1, tOut, x_init);
+title(ax1, '[Open loop]')
+
+ax2 = nexttile(tlay_1);
+plot(ax2, tOut_cl, x_cl_init);
+title(ax2, '[Closed loop]')
 
 %%%%%%%%%
-% Obtain step response
+% Obtain step response of open loop system
 %%%%%%%%%
+figure(2)
 
-% Display step response of open loop system
-% step(sys)
+[y_step, tOut, x_step] = step(sys);
 
-% Display step response of closed loop system
-% step(sys_cl)
+tlay_2 = tiledlayout(2,2);
 
-% You can use functions such as 
-% step: Step response
-% initial: Given initial conditions, get unforced system response
-% lsim: Plot simulated time response of dynamic system to arbitrary inputs; simulated response data
+title(tlay_2, 'Open loop step response');
+xlabel(tlay_2, 'Time');
+ylabel(tlay_2, 'Amplitude');
+
+ax1 = nexttile(tlay_2);
+plot(ax1, tOut, y_step(:, 1,1));
+title(ax1, 'y1 output for u = [1,0].T ')
+
+ax2 = nexttile(tlay_2);
+plot(ax2, tOut, y_step(:, 2,1));
+title(ax2, 'y2 output for u = [1,0].T ')
+
+ax3 = nexttile(tlay_2);
+plot(ax3, tOut, y_step(:, 1,2));
+title(ax3, 'y1 output for u = [1,0].T ')
+
+ax4 = nexttile(tlay_2);
+plot(ax4, tOut, y_step(:, 2,2));
+title(ax4, 'y2 output for u = [1,0].T ')
+
+%%%%%%%%%
+% Obtain step response of closed loop system
+%%%%%%%%%
+figure(3)
+[y_step, tOut, x_step] = step(sys_cl);
+
+tlay_3 = tiledlayout(2,2);
+
+title(tlay_3, 'Closed loop step response');
+xlabel(tlay_3, 'Time');
+ylabel(tlay_3, 'Amplitude');
+
+ax1 = nexttile(tlay_3);
+plot(ax1, tOut, y_step(:, 1,1));
+title(ax1, 'y1 output for u = [1,0].T ')
+
+ax2 = nexttile(tlay_3);
+plot(ax2, tOut, y_step(:, 2,1));
+title(ax2, 'y2 output for u = [1,0].T ')
+
+ax3 = nexttile(tlay_3);
+plot(ax3, tOut, y_step(:, 1,2));
+title(ax3, 'y1 output for u = [1,0].T ')
+
+ax4 = nexttile(tlay_3);
+plot(ax4, tOut, y_step(:, 2,2));
+title(ax4, 'y2 output for u = [1,0].T ')
+
+
+%%%%%%%%%
+% Check step response data
+%%%%%%%%%
 
 step_info_closed = stepinfo(sys_cl);
 
@@ -219,25 +300,25 @@ step_info_closed_y2_u2 = step_info_closed(2,2);
 % disp("Required Settling time = 10%")
 % disp("Required peak overshoot = 20s")
 
-disp("With step input U_1 for output Y_1")
-fprintf("Settling Time: %f \n", step_info_closed_y1_u1.SettlingTime)
-fprintf("Peak overshoot: %f %% \n", step_info_closed_y1_u1.Overshoot)
-fprintf('Is design requirement met? %d \n \n', isDesignRequirementsMet(step_info_closed_y1_u1));
-
-disp("With step input U_1 for output Y_2")
-fprintf("Settling Time: %f \n", step_info_closed_y2_u1.SettlingTime)
-fprintf("Peak overshoot: %f %% \n", step_info_closed_y2_u1.Overshoot)
-fprintf('Is design requirement met? %d \n \n', isDesignRequirementsMet(step_info_closed_y2_u1));
-
-disp("With step input U_2 for output Y_1")
-fprintf("Settling Time: %f \n", step_info_closed_y1_u2.SettlingTime)
-fprintf("Peak overshoot: %f %% \n", step_info_closed_y1_u2.Overshoot)
-fprintf('Is design requirement met? %d \n \n', isDesignRequirementsMet(step_info_closed_y1_u2));
-
-disp("With step input U_2 for output Y_2")
-fprintf("Settling Time: %f \n", step_info_closed_y2_u2.SettlingTime)
-fprintf("Peak overshoot: %f %% \n", step_info_closed_y2_u2.Overshoot)
-fprintf('Is design requirement met? %d \n \n', isDesignRequirementsMet(step_info_closed_y2_u2));
+% disp("With step input U_1 for output Y_1")
+% fprintf("Settling Time: %f \n", step_info_closed_y1_u1.SettlingTime)
+% fprintf("Peak overshoot: %f %% \n", step_info_closed_y1_u1.Overshoot)
+% fprintf('Is design requirement met? %d \n \n', isDesignRequirementsMet(step_info_closed_y1_u1));
+% 
+% disp("With step input U_1 for output Y_2")
+% fprintf("Settling Time: %f \n", step_info_closed_y2_u1.SettlingTime)
+% fprintf("Peak overshoot: %f %% \n", step_info_closed_y2_u1.Overshoot)
+% fprintf('Is design requirement met? %d \n \n', isDesignRequirementsMet(step_info_closed_y2_u1));
+% 
+% disp("With step input U_2 for output Y_1")
+% fprintf("Settling Time: %f \n", step_info_closed_y1_u2.SettlingTime)
+% fprintf("Peak overshoot: %f %% \n", step_info_closed_y1_u2.Overshoot)
+% fprintf('Is design requirement met? %d \n \n', isDesignRequirementsMet(step_info_closed_y1_u2));
+% 
+% disp("With step input U_2 for output Y_2")
+% fprintf("Settling Time: %f \n", step_info_closed_y2_u2.SettlingTime)
+% fprintf("Peak overshoot: %f %% \n", step_info_closed_y2_u2.Overshoot)
+% fprintf('Is design requirement met? %d \n \n', isDesignRequirementsMet(step_info_closed_y2_u2));
 
 
 function design_fulfilled = isDesignRequirementsMet(step_info)
