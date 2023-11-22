@@ -1,4 +1,13 @@
-format shortEng
+format long
+%%%%%%
+% Question
+%%%%%%
+% Assume that you can measure all the four state variables, design a state feedback controller using
+% the LQR method, simulate the designed system, check the step responses and show all the state
+% responses to non-zero initial state with zero external inputs. Discuss effects of weightings Q and
+% R on system performance, and also monitor control signal size. In this step, both the disturbance
+% and set point can be assumed to be zero.
+
 %%%%%%
 % State Space Model
 %%%%%%
@@ -6,8 +15,7 @@ format shortEng
 %Arbitrary params
 % X_dot = A * X + B * U
 % Y = C * X
-% [a, b, c, d] = deal(4, 3, 2, 3);
-[a, b, c, d] = deal(5, 9, 1, 2);
+[a, b, c, d] = deal(4, 9, 1, 2);
 
 % State(or system) matrix
 A = [-8.8487 + (a-b)/5,     -0.0399,              -5.55 + (c+d)/10,      3.5846; 
@@ -24,6 +32,9 @@ B = [0.0564+(b)/(10+c),           0.0319;
 % Output matrix
 C = [-3.2988,           -2.1932+(10*c+d)/(100+5*a), 0.0370,  -0.0109; 
      0.2922-(a*b)/500,  -2.1506,                   -0.0104,   0.0163;];
+
+D = [0, 0; 
+     0, 0;];
 
 x_0 = [0.5; -0.1; 0.3; -0.8;];
 
@@ -56,7 +67,7 @@ disp(vpa(C))
 % the cost of higher control effort.
 Q = [100 0 0 0;
      0 1000 0 0;
-     0 0 1 0;
+     0 0 10 0;
      0 0 0 1;]; 
 
 % R is weighting of u with size (mxm)
@@ -214,19 +225,59 @@ plot(ax4, tOut, y_step(:, 2,2));
 title(ax4, 'y2 output for u = [1,0].T ')
 
 
+%%%%%%
+% Get Step info response
+%%%%%%
+% Original open loop System
+step_info_open = stepinfo(sys);
+
+% Closed loop System
+step_info_closed = stepinfo(sys_cl);
+
 %%%%%%%%%
-% Check step response data
+% Check step response data (OPEN LOOP)
 %%%%%%%%%
 
-step_info_closed = stepinfo(sys_cl);
+disp("=========")
+disp("Open loop step response")
+disp("=========")
+
+step_info_open_y1_u1 = step_info_open(1,1);
+step_info_open_y2_u1 = step_info_open(2,1);
+step_info_open_y1_u2 = step_info_open(1,2);
+step_info_open_y2_u2 = step_info_open(2,2);
+
+disp("With step input U_1 for output Y_1")
+fprintf("Settling Time: %f \n", step_info_open_y1_u1.SettlingTime)
+fprintf("Peak overshoot: %f %% \n", step_info_open_y1_u1.Overshoot)
+fprintf('Is design requirement met? %d \n \n', isDesignRequirementsMet(step_info_open_y1_u1));
+
+disp("With step input U_1 for output Y_2")
+fprintf("Settling Time: %f \n", step_info_open_y2_u1.SettlingTime)
+fprintf("Peak overshoot: %f %% \n", step_info_open_y2_u1.Overshoot)
+fprintf('Is design requirement met? %d \n \n', isDesignRequirementsMet(step_info_open_y2_u1));
+
+disp("With step input U_2 for output Y_1")
+fprintf("Settling Time: %f \n", step_info_open_y1_u2.SettlingTime)
+fprintf("Peak overshoot: %f %% \n", step_info_open_y1_u2.Overshoot)
+fprintf('Is design requirement met? %d \n \n', isDesignRequirementsMet(step_info_open_y1_u2));
+
+disp("With step input U_2 for output Y_2")
+fprintf("Settling Time: %f \n", step_info_open_y2_u2.SettlingTime)
+fprintf("Peak overshoot: %f %% \n", step_info_open_y2_u2.Overshoot)
+fprintf('Is design requirement met? %d \n \n', isDesignRequirementsMet(step_info_open_y2_u2));
+
+%%%%%%%%%
+% Check step response data (CLOSED LOOP)
+%%%%%%%%%
+disp("=========")
+disp("Closed loop step response")
+disp("=========")
 
 step_info_closed_y1_u1 = step_info_closed(1,1);
 step_info_closed_y2_u1 = step_info_closed(2,1);
 step_info_closed_y1_u2 = step_info_closed(1,2);
 step_info_closed_y2_u2 = step_info_closed(2,2);
-
-disp("Required Settling time = 10%")
-disp("Required peak overshoot = 20s")
 
 disp("With step input U_1 for output Y_1")
 fprintf("Settling Time: %f \n", step_info_closed_y1_u1.SettlingTime)
@@ -247,8 +298,6 @@ disp("With step input U_2 for output Y_2")
 fprintf("Settling Time: %f \n", step_info_closed_y2_u2.SettlingTime)
 fprintf("Peak overshoot: %f %% \n", step_info_closed_y2_u2.Overshoot)
 fprintf('Is design requirement met? %d \n \n', isDesignRequirementsMet(step_info_closed_y2_u2));
-
-
 
 %%%%%%%%%
 % FUnction definitions
