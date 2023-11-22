@@ -41,7 +41,7 @@ x_0 = [0.5; -0.1; 0.3; -0.8;];
 u_1 = [1; 0;];
 u_2 = [0; 1;];
 
-% Number of states n and inputs m
+% Number of states n and outputs m
 n = size(A, 2);
 m = size(C, 1);
 

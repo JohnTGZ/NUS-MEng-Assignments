@@ -5,7 +5,6 @@
 % output signals.
 %%%%%%
 
-
 format long
 %%%%%%
 % State Space Model
@@ -40,13 +39,12 @@ x_0 = [0.5; -0.1; 0.3; -0.8;];
 u_1 = [1; 0;];
 u_2 = [0; 1;];
 
-% Number of states n, inputs m and outputs p
+% Number of states n, outputs m 
 n = size(A, 2);
-m = size(B, 2);
-p = size(C, 1);
+m = size(C, 1);
 
 fprintf("Num of states: %d \n", n);
-fprintf("Num of inputs: %d \n", m);
+fprintf("Num of outputs: %d \n", m);
 
 %%%%%%
 % Check controllability and that the 
