@@ -145,6 +145,7 @@ A_cl_eigenvalues = eig(A_cl);
 disp("Closed loop system eigenvalues (A_cl): ");
 disp(vpa(A_cl_eigenvalues));
 
+
 %%%%%%%%%
 % Obtain 4 state responses to non-zero initial state with zero external
 % inputs
@@ -225,79 +226,79 @@ plot(ax4, tOut, y_step(:, 2,2));
 title(ax4, 'y2 output for u = [1,0].T ')
 
 
-%%%%%%
-% Get Step info response
-%%%%%%
-% Original open loop System
-step_info_open = stepinfo(sys);
-
-% Closed loop System
-step_info_closed = stepinfo(sys_cl);
-
-%%%%%%%%%
-% Check step response data (OPEN LOOP)
-%%%%%%%%%
-
-disp("=========")
-disp("Open loop step response")
-disp("=========")
-
-step_info_open_y1_u1 = step_info_open(1,1);
-step_info_open_y2_u1 = step_info_open(2,1);
-step_info_open_y1_u2 = step_info_open(1,2);
-step_info_open_y2_u2 = step_info_open(2,2);
-
-disp("With step input U_1 for output Y_1")
-fprintf("Settling Time: %f \n", step_info_open_y1_u1.SettlingTime)
-fprintf("Peak overshoot: %f %% \n", step_info_open_y1_u1.Overshoot)
-fprintf('Is design requirement met? %d \n \n', isDesignRequirementsMet(step_info_open_y1_u1));
-
-disp("With step input U_1 for output Y_2")
-fprintf("Settling Time: %f \n", step_info_open_y2_u1.SettlingTime)
-fprintf("Peak overshoot: %f %% \n", step_info_open_y2_u1.Overshoot)
-fprintf('Is design requirement met? %d \n \n', isDesignRequirementsMet(step_info_open_y2_u1));
-
-disp("With step input U_2 for output Y_1")
-fprintf("Settling Time: %f \n", step_info_open_y1_u2.SettlingTime)
-fprintf("Peak overshoot: %f %% \n", step_info_open_y1_u2.Overshoot)
-fprintf('Is design requirement met? %d \n \n', isDesignRequirementsMet(step_info_open_y1_u2));
-
-disp("With step input U_2 for output Y_2")
-fprintf("Settling Time: %f \n", step_info_open_y2_u2.SettlingTime)
-fprintf("Peak overshoot: %f %% \n", step_info_open_y2_u2.Overshoot)
-fprintf('Is design requirement met? %d \n \n', isDesignRequirementsMet(step_info_open_y2_u2));
-
-%%%%%%%%%
-% Check step response data (CLOSED LOOP)
-%%%%%%%%%
-disp("=========")
-disp("Closed loop step response")
-disp("=========")
-
-step_info_closed_y1_u1 = step_info_closed(1,1);
-step_info_closed_y2_u1 = step_info_closed(2,1);
-step_info_closed_y1_u2 = step_info_closed(1,2);
-step_info_closed_y2_u2 = step_info_closed(2,2);
-
-disp("With step input U_1 for output Y_1")
-fprintf("Settling Time: %f \n", step_info_closed_y1_u1.SettlingTime)
-fprintf("Peak overshoot: %f %% \n", step_info_closed_y1_u1.Overshoot)
-fprintf('Is design requirement met? %d \n \n', isDesignRequirementsMet(step_info_closed_y1_u1));
-
-disp("With step input U_1 for output Y_2")
-fprintf("Settling Time: %f \n", step_info_closed_y2_u1.SettlingTime)
-fprintf("Peak overshoot: %f %% \n", step_info_closed_y2_u1.Overshoot)
-fprintf('Is design requirement met? %d \n \n', isDesignRequirementsMet(step_info_closed_y2_u1));
-
-disp("With step input U_2 for output Y_1")
-fprintf("Settling Time: %f \n", step_info_closed_y1_u2.SettlingTime)
-fprintf("Peak overshoot: %f %% \n", step_info_closed_y1_u2.Overshoot)
-fprintf('Is design requirement met? %d \n \n', isDesignRequirementsMet(step_info_closed_y1_u2));
-
-disp("With step input U_2 for output Y_2")
-fprintf("Settling Time: %f \n", step_info_closed_y2_u2.SettlingTime)
-fprintf("Peak overshoot: %f %% \n", step_info_closed_y2_u2.Overshoot)
-fprintf('Is design requirement met? %d \n \n', isDesignRequirementsMet(step_info_closed_y2_u2));
+% %%%%%%
+% % Get Step info response
+% %%%%%%
+% % Original open loop System
+% step_info_open = stepinfo(sys);
+% 
+% % Closed loop System
+% step_info_closed = stepinfo(sys_cl);
+% 
+% %%%%%%%%%
+% % Check step response data (OPEN LOOP)
+% %%%%%%%%%
+% 
+% disp("=========")
+% disp("Open loop step response")
+% disp("=========")
+% 
+% step_info_open_y1_u1 = step_info_open(1,1);
+% step_info_open_y2_u1 = step_info_open(2,1);
+% step_info_open_y1_u2 = step_info_open(1,2);
+% step_info_open_y2_u2 = step_info_open(2,2);
+% 
+% disp("With step input U_1 for output Y_1")
+% fprintf("Settling Time: %f \n", step_info_open_y1_u1.SettlingTime)
+% fprintf("Peak overshoot: %f %% \n", step_info_open_y1_u1.Overshoot)
+% fprintf('Is design requirement met? %d \n \n', isDesignRequirementsMet(step_info_open_y1_u1));
+% 
+% disp("With step input U_1 for output Y_2")
+% fprintf("Settling Time: %f \n", step_info_open_y2_u1.SettlingTime)
+% fprintf("Peak overshoot: %f %% \n", step_info_open_y2_u1.Overshoot)
+% fprintf('Is design requirement met? %d \n \n', isDesignRequirementsMet(step_info_open_y2_u1));
+% 
+% disp("With step input U_2 for output Y_1")
+% fprintf("Settling Time: %f \n", step_info_open_y1_u2.SettlingTime)
+% fprintf("Peak overshoot: %f %% \n", step_info_open_y1_u2.Overshoot)
+% fprintf('Is design requirement met? %d \n \n', isDesignRequirementsMet(step_info_open_y1_u2));
+% 
+% disp("With step input U_2 for output Y_2")
+% fprintf("Settling Time: %f \n", step_info_open_y2_u2.SettlingTime)
+% fprintf("Peak overshoot: %f %% \n", step_info_open_y2_u2.Overshoot)
+% fprintf('Is design requirement met? %d \n \n', isDesignRequirementsMet(step_info_open_y2_u2));
+% 
+% %%%%%%%%%
+% % Check step response data (CLOSED LOOP)
+% %%%%%%%%%
+% disp("=========")
+% disp("Closed loop step response")
+% disp("=========")
+% 
+% step_info_closed_y1_u1 = step_info_closed(1,1);
+% step_info_closed_y2_u1 = step_info_closed(2,1);
+% step_info_closed_y1_u2 = step_info_closed(1,2);
+% step_info_closed_y2_u2 = step_info_closed(2,2);
+% 
+% disp("With step input U_1 for output Y_1")
+% fprintf("Settling Time: %f \n", step_info_closed_y1_u1.SettlingTime)
+% fprintf("Peak overshoot: %f %% \n", step_info_closed_y1_u1.Overshoot)
+% fprintf('Is design requirement met? %d \n \n', isDesignRequirementsMet(step_info_closed_y1_u1));
+% 
+% disp("With step input U_1 for output Y_2")
+% fprintf("Settling Time: %f \n", step_info_closed_y2_u1.SettlingTime)
+% fprintf("Peak overshoot: %f %% \n", step_info_closed_y2_u1.Overshoot)
+% fprintf('Is design requirement met? %d \n \n', isDesignRequirementsMet(step_info_closed_y2_u1));
+% 
+% disp("With step input U_2 for output Y_1")
+% fprintf("Settling Time: %f \n", step_info_closed_y1_u2.SettlingTime)
+% fprintf("Peak overshoot: %f %% \n", step_info_closed_y1_u2.Overshoot)
+% fprintf('Is design requirement met? %d \n \n', isDesignRequirementsMet(step_info_closed_y1_u2));
+% 
+% disp("With step input U_2 for output Y_2")
+% fprintf("Settling Time: %f \n", step_info_closed_y2_u2.SettlingTime)
+% fprintf("Peak overshoot: %f %% \n", step_info_closed_y2_u2.Overshoot)
+% fprintf('Is design requirement met? %d \n \n', isDesignRequirementsMet(step_info_closed_y2_u2));
 
 %%%%%%%%%
 % FUnction definitions

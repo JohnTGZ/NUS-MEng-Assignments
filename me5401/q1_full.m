@@ -1,5 +1,4 @@
 format long
-
 %%%%%%
 % Question
 %%%%%%
@@ -44,7 +43,7 @@ u_2 = [0; 1;];
 
 % Number of states n
 n = size(A, 2);
-m = size(B, 2);
+m = size(C, 1);
 
 % Check eigenvalues of open loop system matrix
 A_eigenvalues = eig(A);
@@ -83,9 +82,14 @@ om = 0.4;
 des_pole_1 = - xi * om + 1i*(om*sqrt(1-xi^2));
 des_pole_2 = conj(des_pole_1);
 % Get Fast poles, they have to be far away from dominant one (2-5 times faster)
-des_pole_3 = real(des_pole_1)*3;
-des_pole_4 = real(des_pole_1)*4;
+des_pole_3 = real(des_pole_1)*2;
+des_pole_4 = real(des_pole_1)*2;
 
+% Our desired poles are: 
+% -0.240000000000000 + 0.320000000000000i 
+% -0.240000000000000 - 0.320000000000000i 
+% -0.720000000000000 + 0.000000000000000i 
+% -0.960000000000000 + 0.000000000000000i
 des_poles = [des_pole_1 des_pole_2 des_pole_3 des_pole_4];
 disp("Desired poles: ")
 disp(des_poles)
@@ -93,17 +97,15 @@ disp(des_poles)
 % We get our desired closed loop polynomial
 syms s;
 % closed_loop_des_poly = vpa((s^2 + 2*xi*om*s + om^2) * (s-des_poles(3)) * (s-des_poles(4)));
-closed_loop_des_poly = ((s^2 + 2*xi*om*s + om^2) * (s-des_poles(3)) * (s-des_poles(4)));
+% closed_loop_des_poly = ((s^2 + 2*xi*om*s + om^2) * (s-des_poles(3)) * (s-des_poles(4)));
+closed_loop_des_poly = expand(simplify((s-des_poles(1)) * (s-des_poles(2)) * (s-des_poles(3)) * (s-des_poles(4))))
 fprintf("Closed loop desired polynomial: %s \n", closed_loop_des_poly);
 
 %%%%%%%%%
 % Check controllability
 %%%%%%%%%
 % Form controllability matrix W_c and check it's rank
-W_c = [];
-for i = 0:n-1
-    W_c = horzcat(W_c, (A^i)*B);
-end
+W_c = [B A*B (A^2)*B (A^3)*B];
 disp("Controllability Matrix: ")
 disp(W_c)
 fprintf("Rank of controllability matrix: %d \n", rank(W_c))
@@ -131,7 +133,8 @@ disp(C_ctrl_inv)
 
 % To get transformation matrix T, for each input, one row is taken out to 
 % construct T.
-% We have 2 inputs, so we take out d1=1 and d1+d2=3
+% d_i is the number of vectors in C_ctrl realted to i-th input u_i
+% We have 2 inputs, so we take out d1=3 and d1+d2=4
 d1 = 2;
 d2 = 2;
 
@@ -144,7 +147,7 @@ T = [q2_T;
      q4_T; 
      q4_T * A;];
 
-T_inv = inv(T);
+T_inv = inv(T)
 
 % From Transformation matrix T, we obtain the controllable canonical form
 A_bar = rmv_eps(T * A * T_inv);
@@ -152,7 +155,6 @@ B_bar = rmv_eps(T * B);
 
 disp("A_bar: ")
 disp(A_bar)
-
 disp("B_bar: ")
 disp(B_bar)
 
@@ -164,28 +166,42 @@ K_bar = sym('K_bar', [m,n]);
 
 % Form closed loop system matrix for A_bar
 A_bar_cl = A_bar - B_bar * K_bar;
-disp("A_bar_cl (Closed loop)")
-disp(A_bar_cl)
+% disp("A_bar_cl (Closed loop)")
+% disp(A_bar_cl)
 
 %%%%%%
 % Get gain matrix K for closed loop system
 %%%%%%
-% From closed loop desired polynomial: (s + 18/25)*(s + 24/25)*((12*s)/25 + s^2 + 4/25) 
+% From closed loop desired polynomial: (s + 18/25)*(s + 24/25)*(s + (6/25 - 8i/25))*(s + (6/25 + 8i/25))
 % Or expanded as s^4 + (54*s^3)/25 + (1036*s^2)/625 + (9384*s)/15625 + 1728/15625
 % Construct the desired closed loop matrix
-A_bar_cl_des = [0               1               0            0; ...
-            0               0               1            0; ...
-            0               0               0            1; ...
-            -1728/15625     -9384/15625    -1036/625    -54/25;];
+
+A_d_og = [0               1               0            0; 
+                0               0               1            0; 
+                0               0               0            1; 
+                -1728/15625     -9384/15625    -1036/625    -54/25;];
+
+
+A_d_both_5 = [0               1               0            0; 
+                0               0               1            0; 
+                0               0               0            1; 
+                -144/625     -(672)/625    -(344)/125    -(72)/25;];
+
+A_d_both_2 = [0               1               0            0; 
+                0               0               1            0; 
+                0               0               0            1; 
+                -576/15625     -(4128)/15625    -(532)/625    -(36)/25;];
+
+A_d = A_d_both_5
 
 % Compare desired polynomial and closed loop polynomial to get values of
 % gain matrix of K_bar
-K_bar_eqn = A_bar_cl_des == A_bar_cl;
+K_bar_eqn = A_bar_cl == A_d;
 K_bar_soln = solve(K_bar_eqn, symvar(K_bar));
-K_bar = subs(K_bar, K_bar_soln);
+K_bar = double(subs(K_bar, K_bar_soln));
 
 % Get gain matrix K
-K = double(K_bar * T);
+K = K_bar * T;
 
 disp("Gain matrix K: ");
 disp(vpa(K));
@@ -207,7 +223,7 @@ disp(vpa(A_eigenvalues));
 %%%%%%
 
 % Get closed loop system matrix for A
-A_cl = double(A - B * K);
+A_cl = A - B * double(K);
 
 % Closed loop System x_dot = (A - B * K)x 
 sys_cl = ss(A_cl, B, C, 0);
@@ -295,7 +311,6 @@ title(ax3, 'y1 output for u = [0,1].T ')
 ax4 = nexttile(tlay_3);
 plot(ax4, tOut, y_step(:, 2,2));
 title(ax4, 'y2 output for u = [0,1].T ')
-
 
 %%%%%%
 % Get Step info response
@@ -389,5 +404,5 @@ end
 
 % Remove small values below a certain threshold
 function M = rmv_eps(M)
-    M(abs(M)<1e-5)=0;
+    M(abs(M)<1e-6)=0;
 end

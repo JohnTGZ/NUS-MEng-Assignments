@@ -52,7 +52,9 @@ m = size(C, 1);
 %%%%%%%%%
 % Check observability
 %%%%%%%%%
-observability_matrix = [C.', A.'*C.', (A.')^2 * C.', (A.')^3 * C.']
+observability_matrix = [C.', A.'*C.', (A.')^2 * C.', (A.')^3 * C.'];
+
+
 % disp("Observability Matrix: ")
 % disp(observability_matrix)
 fprintf("Rank of observability matrix: %d \n", rank(observability_matrix))
@@ -69,7 +71,8 @@ fprintf("We want to estimate %d state variables\n", num_est_states)
 %%%%%%%%%
 % Find constraints on T such taht [C; T;] is non-singular
 %%%%%%%%%
-T = sym('t', [num_est_states,n])
+T = sym('t', [num_est_states,n]);
+
 
 % C_T_matrix: State variable transformation matrix
 C_T_matrix = [C; T;];
@@ -95,7 +98,7 @@ G = sym('g', [num_est_states, m]);
 
 % There are an infinite number of solutions, so we choose values of g.
 % To get G, choose g1 = 10 and g2 = 1 
-G = subs(G, [struct('g1_1', 1, 'g1_2', 0, 'g2_1', 0, 'g2_2', 1)])
+G = double(subs(G, [struct('g1_1', 1, 'g1_2', 0, 'g2_1', 0, 'g2_2', 1)]))
 
 lhs_eqn = T * A - D * T
 rhs_eqn = G * C
@@ -106,12 +109,19 @@ eqn = T * A - D * T == G * C;
 T_soln = solve(eqn, symvar(T))
 
 % Get T
-T = subs(T, T_soln);
+T = double(subs(T, T_soln));
+
+disp("T:")
+disp(vpa(T))
+
 
 % Check if C_T_matrix is singular
 C_T_matrix = [C; T;];
+% disp("C_T_matrix:")
+% disp(vpa(C_T_matrix))
+
 disp("Determinant of C_T_matrix:")
-disp(det(C_T_matrix))
+disp(vpa(det(C_T_matrix)))
 % Determinant of C_T_matrix is not zero, hence C_T_Matrix is non-singular
 
 %%%%%%%%%
@@ -134,78 +144,66 @@ u = sym("u");
 %%%%%%%%%
 xi = sym("xi", [num_est_states, 1]);
 
-C_T_matrix = [C; T;];
-C_T_matrix_inv = inv(C_T_matrix)
+C_T_matrix_inv = inv(C_T_matrix);
 
-x_est = inv(C_T_matrix) * [y; xi;]
+x_est = C_T_matrix_inv * [y; xi;];
 
+C_T_matrix_inv
 
+%%%%%%%%%
+% Use LQR gain matrix from Q2
+%%%%%%%%%
 
+K = 1.0e+02 * [-0.043600269508890   0.238567661568677  -0.002330534139679  -0.405118256624524;
+  -0.196741470090894  -2.005606595495490   0.281426302914144   0.025449196238241;];
 
-% %%%%%%%%%
-% % Check step response data (OPEN LOOP)
-% %%%%%%%%%
-% 
-% disp("=========")
-% disp("Open loop step response")
-% disp("=========")
-% 
-% step_info_open_y1_u1 = step_info_open(1,1);
-% step_info_open_y2_u1 = step_info_open(2,1);
-% step_info_open_y1_u2 = step_info_open(1,2);
-% step_info_open_y2_u2 = step_info_open(2,2);
-% 
-% disp("With step input U_1 for output Y_1")
-% fprintf("Settling Time: %f \n", step_info_open_y1_u1.SettlingTime)
-% fprintf("Peak overshoot: %f %% \n", step_info_open_y1_u1.Overshoot)
-% fprintf('Is design requirement met? %d \n \n', isDesignRequirementsMet(step_info_open_y1_u1));
-% 
-% disp("With step input U_1 for output Y_2")
-% fprintf("Settling Time: %f \n", step_info_open_y2_u1.SettlingTime)
-% fprintf("Peak overshoot: %f %% \n", step_info_open_y2_u1.Overshoot)
-% fprintf('Is design requirement met? %d \n \n', isDesignRequirementsMet(step_info_open_y2_u1));
-% 
-% disp("With step input U_2 for output Y_1")
-% fprintf("Settling Time: %f \n", step_info_open_y1_u2.SettlingTime)
-% fprintf("Peak overshoot: %f %% \n", step_info_open_y1_u2.Overshoot)
-% fprintf('Is design requirement met? %d \n \n', isDesignRequirementsMet(step_info_open_y1_u2));
-% 
-% disp("With step input U_2 for output Y_2")
-% fprintf("Settling Time: %f \n", step_info_open_y2_u2.SettlingTime)
-% fprintf("Peak overshoot: %f %% \n", step_info_open_y2_u2.Overshoot)
-% fprintf('Is design requirement met? %d \n \n', isDesignRequirementsMet(step_info_open_y2_u2));
-% 
-% %%%%%%%%%
-% % Check step response data (CLOSED LOOP)
-% %%%%%%%%%
-% disp("=========")
-% disp("Closed loop step response")
-% disp("=========")
-% 
-% step_info_closed_y1_u1 = step_info_closed(1,1);
-% step_info_closed_y2_u1 = step_info_closed(2,1);
-% step_info_closed_y1_u2 = step_info_closed(1,2);
-% step_info_closed_y2_u2 = step_info_closed(2,2);
-% 
-% disp("With step input U_1 for output Y_1")
-% fprintf("Settling Time: %f \n", step_info_closed_y1_u1.SettlingTime)
-% fprintf("Peak overshoot: %f %% \n", step_info_closed_y1_u1.Overshoot)
-% fprintf('Is design requirement met? %d \n \n', isDesignRequirementsMet(step_info_closed_y1_u1));
-% 
-% disp("With step input U_1 for output Y_2")
-% fprintf("Settling Time: %f \n", step_info_closed_y2_u1.SettlingTime)
-% fprintf("Peak overshoot: %f %% \n", step_info_closed_y2_u1.Overshoot)
-% fprintf('Is design requirement met? %d \n \n', isDesignRequirementsMet(step_info_closed_y2_u1));
-% 
-% disp("With step input U_2 for output Y_1")
-% fprintf("Settling Time: %f \n", step_info_closed_y1_u2.SettlingTime)
-% fprintf("Peak overshoot: %f %% \n", step_info_closed_y1_u2.Overshoot)
-% fprintf('Is design requirement met? %d \n \n', isDesignRequirementsMet(step_info_closed_y1_u2));
-% 
-% disp("With step input U_2 for output Y_2")
-% fprintf("Settling Time: %f \n", step_info_closed_y2_u2.SettlingTime)
-% fprintf("Peak overshoot: %f %% \n", step_info_closed_y2_u2.Overshoot)
-% fprintf('Is design requirement met? %d \n \n', isDesignRequirementsMet(step_info_closed_y2_u2));
+% For input U1: Form closed loop system and measure step response
+setpoint_stepinfo_u1 = stepinfo(out.setpoint_response_u1.Data,out.setpoint_response_u1.Time);
+setpoint_stepinfo_u2 = stepinfo(out.setpoint_response_u2.Data,out.setpoint_response_u2.Time);
+
+%%%%%%%%%
+% Check setpoint response data for input U1
+%%%%%%%%%
+
+disp("=========")
+disp("Open loop step response for input U1")
+disp("=========")
+
+step_info_open_y1 = setpoint_stepinfo_u1(1,1);
+step_info_open_y2 = setpoint_stepinfo_u2(2,1);
+
+disp("Setpoint stepinfo output Y_1")
+fprintf("Settling Time: %f \n", step_info_open_y1.SettlingTime)
+fprintf("Peak overshoot: %f %% \n", step_info_open_y1.Overshoot)
+fprintf('Is design requirement met? %d \n \n', isDesignRequirementsMet(step_info_open_y1));
+
+disp("Setpoint stepinfo for output Y_2")
+fprintf("Settling Time: %f \n", step_info_open_y2.SettlingTime)
+fprintf("Peak overshoot: %f %% \n", step_info_open_y2.Overshoot)
+fprintf('Is design requirement met? %d \n \n', isDesignRequirementsMet(step_info_open_y2));
+    
+
+%%%%%%%%%
+% Check setpoint response data for input U2
+%%%%%%%%%
+
+disp("=========")
+disp("Open loop step responsefor input U2")
+disp("=========")
+
+step_info_open_y1 = setpoint_stepinfo_u2(1,1);
+step_info_open_y2 = setpoint_stepinfo_u2(2,1);
+
+disp("Setpoint stepinfo output Y_1")
+fprintf("Settling Time: %f \n", step_info_open_y1.SettlingTime)
+fprintf("Peak overshoot: %f %% \n", step_info_open_y1.Overshoot)
+fprintf('Is design requirement met? %d \n \n', isDesignRequirementsMet(step_info_open_y1));
+
+disp("Setpoint stepinfo for output Y_2")
+fprintf("Settling Time: %f \n", step_info_open_y2.SettlingTime)
+fprintf("Peak overshoot: %f %% \n", step_info_open_y2.Overshoot)
+fprintf('Is design requirement met? %d \n \n', isDesignRequirementsMet(step_info_open_y2));
+    
 
 %%%%%%%%%
 % FUnction definitions

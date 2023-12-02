@@ -47,32 +47,21 @@ fprintf("Num of states: %d \n", n);
 fprintf("Num of outputs: %d \n", m);
 
 %%%%%%
-% Check controllability and that the 
-% rank of [A, B; C, 0;] == n + m
+% Check controllability by checking that the rank of [A, B; C, 0;] == n + m
 %%%%%%
-
-% Form controllability matrix W_c and check it's rank
-W_c = [];
-for i = 0:n-1
-    W_c = horzcat(W_c, (A^i)*B);
-end
-disp("Controllability Matrix: ")
-disp(W_c)
-fprintf("Rank of controllability matrix: %d \n", rank(W_c))
-% Since controllability matrix is 2 (full rank). Hence all states are
-% controllable.
-
-% Check that rank of [A, B; C, 0;] == n + m
-if (rank([A, B; C, zeros(2,2);]) == (n + m))
-    fprintf("[A, B; C, 0;] matrix is full rank at %d\n", rank([A, B; C, zeros(2,2);]))
+% For a mxm plant where there are m inputs and m outputs
+% Check that augmented system is controllable by checking that [A, B; C, 0;] == n + m 
+if (rank([A, B; C, zeros(m,m);]) == (n + m))
+    fprintf("[A, B; C, 0;] matrix is full rank at %d\n", rank([A, B; C, zeros(m,m);]))
 else
-    fprintf("[A, B; C, 0;] matrix is not full rank at %d\n", rank([A, B; C, zeros(2,2);]))
+    fprintf("[A, B; C, 0;] matrix is not full rank at %d\n", rank([A, B; C, zeros(m,m);]))
 end 
 
+
 %%%%%%
+% If augmented system is controllable, it can be stab
 % Form augmented system
 %%%%%%
-
 A_bar = [A,  zeros(n, m);
          -C, zeros(m, m);];
 
@@ -85,7 +74,7 @@ B_bar = [B;
 % B_r_bar = [zeros(n,m);
 %            eye(m,m);];
 
-C_bar = [C, zeros(p,m);];
+C_bar = [C, zeros(m,m);];
 
 %%%%%%
 % We use LQR to stabilize the augmented system
@@ -102,17 +91,56 @@ Q = [1 0 0 0 0 0;
      0 0 1 0 0 0;
      0 0 0 1 0 0;
      0 0 0 0 1000 0;
-     0 0 0 0 0 1000;];
+     0 0 0 0 0 100;];
 
-R = [1 0;
-     0 1;];
+R = [0.0001 0;
+     0 0.0001;];
 
 [X,K,L] = icare(A_bar,B_bar,Q,R,[],[],[]);
 
-% Obtain gain matrices K1 and K2 from the LQR gain matrix
+% % Obtain gain matrices K1 and K2 from the LQR gain matrix
 % K1 = K(:, 1:n);
 % K2 = K(:, n+1:end);
 
+%%%%%%%%%
+% Store matrices for state observer
+%%%%%%%%%
+D = [-1 0; 
+     0 -1;];
+E = [-0.179108013653627  -0.106649750104643
+      0.455492072025065   0.059394579209481];
+G = [1 0; 
+     0 1;];
+C_T_matrix_inv = [-0.292392890492903   0.278799577693527  -0.115994901359206   0.063648155853290;
+                  -0.027045766046657  -0.439986590393009   0.034561335477943  -0.028620242458612;
+                  -0.565753323097382  -0.212213296092144  -8.104940536716425   3.312412963238812;
+                   0.020641439655510  -0.603303471575275   0.955724158055884  -2.522510584828376;];
+
+%%%%%%%%%
+% Check setpoint response data 
+%%%%%%%%%
+
+% Form closed loop system and measure step response
+out.setpoint_response.Data;
+setpoint_stepinfo = stepinfo(out.setpoint_response.Data,out.setpoint_response.Time);
+
+disp("=========")
+disp("Open loop step response")
+disp("=========")
+
+step_info_open_y1 = setpoint_stepinfo(1,1);
+step_info_open_y2 = setpoint_stepinfo(2,1);
+
+disp("Setpoint stepinfo output Y_1")
+fprintf("Settling Time: %f \n", step_info_open_y1.SettlingTime)
+fprintf("Peak overshoot: %f %% \n", step_info_open_y1.Overshoot)
+fprintf('Is design requirement met? %d \n \n', isDesignRequirementsMet(step_info_open_y1));
+
+disp("Setpoint stepinfo for output Y_2")
+fprintf("Settling Time: %f \n", step_info_open_y2.SettlingTime)
+fprintf("Peak overshoot: %f %% \n", step_info_open_y2.Overshoot)
+fprintf('Is design requirement met? %d \n \n', isDesignRequirementsMet(step_info_open_y2));
+    
 %%%%%%%%%
 % FUnction definitions
 %%%%%%%%%
