@@ -1,0 +1,38 @@
+############
+fit1p
+############
+# Barrier
+10 loops, best of 5: 823 msec per loop
+
+# primalSimplex
+10 loops, best of 5: 186 msec per loop
+
+# dualSimplex
+10 loops, best of 5: 197 msec per loop
+
+############
+fit1d
+############
+# Barrier
+10 loops, best of 5: 207 msec per loop
+
+# primalSimplex
+10 loops, best of 5: 205 msec per loop
+
+# dualSimplex
+10 loops, best of 5: 181 msec per loop
+
+############
+maros-r7
+############
+# Barrier
+1 loop, best of 5: 3.24 sec per loop
+
+# primalSimplex
+1 loop, best of 5: 3.38 sec per loop
+
+# dualSimplex
+1 loop, best of 5: 3.35 sec per loop
+
+
+
