@@ -1,0 +1,3 @@
+/home/john/repos/homework/me5414/or_tools/CMakeFiles/rebuild_cache.dir
+/home/john/repos/homework/me5414/or_tools/CMakeFiles/edit_cache.dir
+/home/john/repos/homework/me5414/or_tools/CMakeFiles/myapp.dir

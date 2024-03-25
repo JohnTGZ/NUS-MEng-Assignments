@@ -1,0 +1,1 @@
+/usr/bin/c++     CMakeFiles/myapp.dir/program.cpp.o  -o myapp  /usr/local/lib/libClp.a /usr/local/lib/libOsi.a /usr/local/lib/libCoinUtils.a /usr/local/lib/libz.a -lpthread 

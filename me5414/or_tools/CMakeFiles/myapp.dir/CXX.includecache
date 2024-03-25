@@ -1,0 +1,22 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/john/repos/homework/me5414/or_tools/program.cpp
+iostream
+-
+memory
+-
+ortools/gurobi/environment.h
+/home/john/repos/homework/me5414/or_tools/ortools/gurobi/environment.h
+ortools/linear_solver/proto_solver/gurobi_proto_solver.h
+/home/john/repos/homework/me5414/or_tools/ortools/linear_solver/proto_solver/gurobi_proto_solver.h
+ortools/linear_solver/linear_solver.h
+/home/john/repos/homework/me5414/or_tools/ortools/linear_solver/linear_solver.h
+ortools/lp_data/mps_reader.h
+/home/john/repos/homework/me5414/or_tools/ortools/lp_data/mps_reader.h
+
