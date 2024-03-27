@@ -1,7 +1,6 @@
 clear; 
 clc;
 
-
 %%%%%%
 % Zeta and wn affects Tp
 %%%%%%
@@ -11,7 +10,7 @@ wn = 5;
 %%%%%%
 % Gamma and gamma
 %%%%%%
-ga = 10;
+ga = 100;
 Gamma = diag([ 10*ga, 10*ga, 10*ga, 10*ga, 10*ga]);
 
 %%%%%%
@@ -27,8 +26,9 @@ sys = tf(num,dem);
 
 pole(sys);
 
+% Rp y = Kp Zp u(t)
 % Zp (plant zero polynomial)
-kp = b0;
+Kp = b0;
 Zp = [1 b1/b0];
 % Rp (plant pole polynomial)
 Rp = [1 a1 a2];
@@ -36,6 +36,7 @@ Rp = [1 a1 a2];
 % Tp (observer polynomial)
 Tp = [1 2*zeta*wn wn^2]
 
+% Rm y = Km u(t)
 % Rm(reference model polynomial)
 am = 3;
 Rm = [1 am];
@@ -49,9 +50,9 @@ Fbar = F/Kp;
 Gbar = conv(E, Zp);
 G1 = Gbar - Tp;
 % Kstar
-Kstar = Km/Kp;
-% gains (Perfect gain)
-theta_bar_star= [Kstar, -G1(3), G1(2), -Fbar(4), -Fbar(3)]
+Kstar = Km / Kp;
+% Gains (Perfect gain)
+theta_bar_star= [Kstar, -G1(3), -G1(2), -Fbar(4), -Fbar(3)]
 
 
 
