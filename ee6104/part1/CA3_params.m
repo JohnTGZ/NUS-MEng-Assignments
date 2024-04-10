@@ -22,7 +22,6 @@ K_w = 0.7827563;       % Gains for tachometer
 % xi = 0.83; % xi
 % w = 18;  % Omega
 
-
 % xi = 0.7; % xi
 % w = 10;  % Omega
 
@@ -37,71 +36,35 @@ gm = [0; w^2];
 %%%%%%
 % Gamma and gamma
 %%%%%%
-% % Tune Gamma and gamma
-% Gamma = [1 0; 
-%          0  1];
-% gamma = 10;
-% 
-% % Tune Q
-% Q = [10 0; 
-%       0 10];
-% 
-% P = lyap(Am', Q);
-
-% Gamma = [10000 0;  0  7000];
-% gamma = 1000;
-% Q = [4000 0; 0 5];
-
-% Start from default
+% % Start from default
 % Gamma = [10 0; 
 %          0  1];
 % gamma = 10;
 % Q = [100 0; 0 1];
 
-% 1: Start from identity
-% 2: increase Q_11 to 100
-% 3: Increase Gamma_11: Increase in oscillation
-% 4: Back to 2: Increase Gamma_22 to 200
-% 5: Increase Q_11 to 500
-% 6: Scale Gamma up to 10, 1000
-% 7: Scale Gamma up to 50, 1000
+% Best lower params
+% Gamma = [100 0; 0  2000]; gamma = 125;
+% Q = [3000 0; 0 5];
 
-% gamma increases the weight of the reference input relative to the error
-% (Increase Q_22: Leads to faster change in x_m,2)
-
-% Gamma = [30 0; 
-%          0  450];
-% gamma = 3;
-% Q = [500 0; 0 1];
-
-% Gamma = [100 0; 
-%          0  300];
-% gamma = 50;
-% Q = [700 0; 0 10];
-
-% Gamma = [200 0; 
-%          0  300];
-% gamma = 100;
-% Q = [2000 0; 0 20];
-
-% Gamma = [250 0; 
-%          0  500];
+% Values for testing
+% Gamma = [500 0; 0 1000]; 
 % gamma = 125;
-% Q = [3000 0; 0 40];
-
+% Q = [5000 0; 0 20];
 
 %%%%%
 % Integral control of angular velocity
 %%%%%
 
-% Gamma = [1 0; 
-%          0  5;
-% gamma = 10;
-% Q = [1 0; 0 15];
 
-Gamma = [1 0;  0  400];
-gamma = 50;
-Q = [1 0; 0 100];
+Gamma = [0.01 0;  0  20];
+gamma = 2;
+Q = [0.1 0; 0 5];
+
+
+% Gamma = [300 0; 
+%          0  200];
+% gamma = 50;
+% Q = [5000 0; 0 150];
 
 P = lyap(Am', Q);
 

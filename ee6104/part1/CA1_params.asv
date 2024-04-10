@@ -4,41 +4,8 @@ clc;
 %%%%%%
 % Zeta and wn affects Tp (Filter)
 %%%%%%
-% A
-% zeta = 0.03; 
-% wn = 5;
-
-% B (Stable)
-% zeta = 0.03;
-% wn = 2;
-
-% C 
-% zeta = 0.03;
-% wn = 1;
-
-% D (unstable)
-% zeta = 0.03;
-% wn = 7;
-
-% Adjust zeta
-
-% E (Overdamped)
-% zeta = 0.12; 
-% wn = 3;
-
-% F (Underdamped)
-% zeta = 0.01;
-% wn = 3;
-
-% F (Critical damping)
-zeta = 0.049;
-wn = 2.45;
-
-
-% % G (Critical damping)
-% zeta = 0.06;
-% wn = 2.45;
-
+zeta = 0.03;
+wn = 5;
 
 %%%%%%
 % Gamma and gamma
