@@ -28,7 +28,7 @@ K_w = 0.7827563;       % Gains for tachometer
 xi = 0.6; % xi
 w = 7;  % Omega
 
-% x_m_dot = A_m*x_m + g_m*b*u
+% x_m_dot = A_m*x_m + g_m*b*r
 Am = [0    1; 
       -w^2 -2*xi*w];
 gm = [0; w^2];
@@ -43,30 +43,25 @@ gm = [0; w^2];
 % Q = [100 0; 0 1];
 
 % Best lower params
-% Gamma = [100 0; 0  2000]; gamma = 125;
-% Q = [3000 0; 0 5];
+Gamma = [100 0; 0  2000]; gamma = 125;
+Q = [3000 0; 0 5];
 
 % Values for testing
 % Gamma = [500 0; 0 1000]; 
 % gamma = 125;
 % Q = [5000 0; 0 20];
 
-%%%%%
-% Integral control of angular velocity
-%%%%%
-
-
-Gamma = [0.01 0;  0  20];
-gamma = 2;
-Q = [0.1 0; 0 5];
-
-
-% Gamma = [300 0; 
-%          0  200];
-% gamma = 50;
-% Q = [5000 0; 0 150];
 
 P = lyap(Am', Q);
+
+
+
+
+
+
+
+
+
 
 
 

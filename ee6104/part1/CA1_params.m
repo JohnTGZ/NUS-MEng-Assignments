@@ -10,7 +10,7 @@ clc;
 
 % B (Stable)
 % zeta = 0.03;
-% wn = 2;
+% wn = 2.5;
 
 % C 
 % zeta = 0.03;
@@ -23,22 +23,16 @@ clc;
 % Adjust zeta
 
 % E (Overdamped)
-% zeta = 0.12; 
-% wn = 3;
+% zeta = 0.25; 
+% wn = 2.5;
 
-% F (Underdamped)
-% zeta = 0.01;
-% wn = 3;
+% F (Undamped)
+% zeta = 0.0;
+% wn = 2.5;
 
-% F (Critical damping)
-zeta = 0.049;
+% G (Critical damping)
+zeta = 0.006;
 wn = 2.45;
-
-
-% % G (Critical damping)
-% zeta = 0.06;
-% wn = 2.45;
-
 
 %%%%%%
 % Gamma and gamma
@@ -56,8 +50,8 @@ a2 = 6.1;
 b0 = -0.5;
 b1 = -1;
 num = [b0 b1];
-dem = [1 a1 a2];
-% dem = [1 2*zeta*wn wn^2];
+% dem = [1 a1 a2];
+dem = [1 2*zeta*wn wn^2];
 sys = tf(num,dem);
 pole(sys)
 
